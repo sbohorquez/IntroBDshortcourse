@@ -202,7 +202,8 @@ summary {
 <p>Esta capacitación es una introducción a métodos de Big Data y Machine Learning, por lo cual partimos del supuesto que no conocen nada de ML. De esta manera, se dará una explicación de los métodos, seguido de un ejemplo práctico sobre como hacerlo en R. Para esto usaremos una base de datos (modificada) de Hipótecas del Distrito de Columbia en EEUU, disponible en: <a href="https://www.consumerfinance.gov/data-research/hmda/historic-data/" class="uri">https://www.consumerfinance.gov/data-research/hmda/historic-data/</a></p>
 <p>Estos son los paquetes que necesitaremos usar:</p>
 <pre class="r"><code>library(tidyverse)
-library(uGMAR)</code></pre>
+library(uGMAR)
+library(RcmdrMisc)</code></pre>
 <div id="qué-métodos-aprenderan-en-esta-capacitación" class="section level3">
 <h3>¿Qué métodos aprenderan en esta capacitación?</h3>
 <ul>
@@ -250,7 +251,8 @@ y = X\beta + \epsilon
 <h3>Ejemplo</h3>
 <p>En esta aplicación queremos estimar la probabilidad que un prestamo para hipóteca sea aceptado. Para esto tenemos datos de la aceptación o rechazo de aplicaciones para hipóteca del Distrito de Columbia en EEUU para el año 2017. Nuestra variable dependiente <span class="math inline">\(y\)</span> será entonces la varaible <em>loan_granted</em> que toma el valor de uno (1) si la hipóteca fue otorgada y cero (0) si no lo fue. Y los regresores, <span class="math inline">\(X\)</span>, contienen caracteristicas de las aplicantes, del prestamo pedido, de la casa, y del co-aplicante del prestamo.</p>
 <p>Estimamos el modelo completo:</p>
-<pre class="r"><code>hmdaDC &lt;- read.csv(&quot;C:/Users/sbohorqu/OneDrive - Universidad EAFIT/EAFIT/Semillero/Capacitaciones/Machine Learning/data_hmdaDC.csv&quot;)
+<pre class="r"><code>hmdaDC &lt;- read.csv(&quot;C:/Users/sbohorqu/OneDrive - Universidad EAFIT/EAFIT/Semillero/Capacitaciones/Machine Learning/data_hmdaDC.csv&quot;) %&gt;%
+        na.omit()
 
 reg1 &lt;- lm(loan_granted ~., data=hmdaDC)
 
@@ -299,7 +301,6 @@ summary(reg1)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.4853 on 27441 degrees of freedom
-##   (3457 observations deleted due to missingness)
 ## Multiple R-squared:  0.0556, Adjusted R-squared:  0.05463 
 ## F-statistic:  57.7 on 28 and 27441 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Si tenemos muchos regresores el vector <span class="math inline">\(\beta\)</span> puedes ser disperso (<em>sparse</em>), es decir varios valores son cero. Por lo cual la pregunta que surge es: ¿Debemos usar todos los regresores en <span class="math inline">\(X\)</span>? y de no hacerlo, ¿Cómo escogemos cuales dejar y cuales excluir?.</p>
@@ -372,35 +373,34 @@ summary(reg2)</code></pre>
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -0.7988 -0.4566  0.3350  0.4475  0.6683 
+## -0.7969 -0.4576  0.3327  0.4457  0.6686 
 ## 
 ## Coefficients:
 ##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)            4.449e-01  6.047e-03  73.572  &lt; 2e-16 ***
-## hispanic_latino       -6.520e-02  1.380e-02  -4.725 2.31e-06 ***
-## co_hispanic_latino    -5.032e-03  2.435e-02  -0.207   0.8363    
-## white                  1.403e-01  8.481e-03  16.546  &lt; 2e-16 ***
-## co_white               2.550e-02  1.234e-02   2.068   0.0387 *  
-## african_american      -2.079e-02  8.928e-03  -2.328   0.0199 *  
-## co_african_american    2.125e-02  1.744e-02   1.219   0.2230    
-## asian_pacific          1.200e-01  1.526e-02   7.861 3.96e-15 ***
-## co_asian_pacific       3.197e-02  2.517e-02   1.270   0.2041    
-## native                -4.795e-02  3.535e-02  -1.356   0.1750    
-## co_native              5.060e-02  9.631e-02   0.525   0.5993    
-## female                 3.241e-02  6.949e-03   4.665 3.11e-06 ***
-## co_female              5.388e-02  1.215e-02   4.434 9.27e-06 ***
-## same_sex               3.169e-02  1.865e-02   1.699   0.0893 .  
-## mixed_race             2.492e-02  4.643e-02   0.537   0.5916    
-## applicant_income_000s  1.472e-06  2.161e-06   0.681   0.4957    
+## (Intercept)            4.464e-01  6.057e-03  73.706  &lt; 2e-16 ***
+## hispanic_latino       -6.502e-02  1.381e-02  -4.707 2.53e-06 ***
+## co_hispanic_latino    -6.547e-03  2.437e-02  -0.269   0.7882    
+## white                  1.400e-01  8.493e-03  16.479  &lt; 2e-16 ***
+## co_white               2.613e-02  1.236e-02   2.113   0.0346 *  
+## african_american      -2.181e-02  8.938e-03  -2.440   0.0147 *  
+## co_african_american    2.144e-02  1.746e-02   1.228   0.2194    
+## asian_pacific          1.198e-01  1.528e-02   7.837 4.77e-15 ***
+## co_asian_pacific       3.428e-02  2.522e-02   1.359   0.1742    
+## native                -5.002e-02  3.534e-02  -1.415   0.1570    
+## co_native              4.925e-02  9.629e-02   0.512   0.6090    
+## female                 3.288e-02  6.957e-03   4.726 2.30e-06 ***
+## co_female              5.436e-02  1.217e-02   4.466 8.00e-06 ***
+## same_sex               3.302e-02  1.870e-02   1.766   0.0774 .  
+## mixed_race             2.832e-02  4.662e-02   0.608   0.5435    
+## applicant_income_000s  1.441e-06  2.160e-06   0.667   0.5047    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.4914 on 27534 degrees of freedom
-##   (3377 observations deleted due to missingness)
-## Multiple R-squared:  0.03154,    Adjusted R-squared:  0.03102 
-## F-statistic: 59.79 on 15 and 27534 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.4913 on 27454 degrees of freedom
+## Multiple R-squared:  0.03184,    Adjusted R-squared:  0.03131 
+## F-statistic:  60.2 on 15 and 27454 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>AIC(reg2)</code></pre>
-<pre><code>## [1] 39058.72</code></pre>
+<pre><code>## [1] 38927.64</code></pre>
 <pre class="r"><code>reg3 &lt;- lm(loan_granted ~ loan_type_name + loan_purpose_name + loan_amount_000s , data=hmdaDC)
 
 summary(reg3)</code></pre>
@@ -411,26 +411,26 @@ summary(reg3)</code></pre>
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -0.6046 -0.4614 -0.2501  0.4189  0.7500 
+## -0.6185 -0.4734  0.3815  0.4212  0.7064 
 ## 
 ## Coefficients:
 ##                                    Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)                       4.139e-01  8.939e-03  46.306  &lt; 2e-16 ***
-## loan_type_nameFHA-insured        -1.639e-01  9.669e-03 -16.956  &lt; 2e-16 ***
-## loan_type_nameFSA/RHS-guaranteed -1.679e-01  2.848e-01  -0.590    0.555    
-## loan_type_nameVA-guaranteed      -6.598e-02  1.400e-02  -4.713 2.45e-06 ***
-## loan_purpose_nameHome purchase    1.672e-01  9.780e-03  17.093  &lt; 2e-16 ***
-## loan_purpose_nameRefinancing      4.732e-02  9.989e-03   4.737 2.18e-06 ***
-## loan_amount_000s                  2.865e-07  6.108e-07   0.469    0.639    
+## (Intercept)                       4.077e-01  9.267e-03  43.999  &lt; 2e-16 ***
+## loan_type_nameFHA-insured        -1.140e-01  1.124e-02 -10.146  &lt; 2e-16 ***
+## loan_type_nameFSA/RHS-guaranteed -1.885e-01  2.838e-01  -0.664   0.5066    
+## loan_type_nameVA-guaranteed      -3.973e-02  1.586e-02  -2.506   0.0122 *  
+## loan_purpose_nameHome purchase    2.108e-01  1.017e-02  20.720  &lt; 2e-16 ***
+## loan_purpose_nameRefinancing      6.573e-02  1.040e-02   6.321 2.63e-10 ***
+## loan_amount_000s                 -9.236e-08  6.765e-07  -0.137   0.8914    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.4932 on 30920 degrees of freedom
-## Multiple R-squared:  0.02725,    Adjusted R-squared:  0.02706 
-## F-statistic: 144.4 on 6 and 30920 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.4915 on 27463 degrees of freedom
+## Multiple R-squared:  0.03057,    Adjusted R-squared:  0.03036 
+## F-statistic: 144.4 on 6 and 27463 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>AIC(reg3)</code></pre>
-<pre><code>## [1] 44054.27</code></pre>
-<p>El AIC para el modelo de características de los individuos es 39058.72 mientras que el AIC para el modelo de caracteristicas del prestamo es 44054.27 por lo cual escogeriamos el primer modelo ya que es el de menor AIC.</p>
+<pre><code>## [1] 38945.57</code></pre>
+<p>El AIC para el modelo de características de los individuos es 38927.64 mientras que el AIC para el modelo de caracteristicas del prestamo es 38945.57 por lo cual escogeriamos el primer modelo ya que es el de menor AIC.</p>
 <p><em>Nota: No existe, o al menos desconozco, una función para el calculo de TIC para modelos univariados, por lo cual no se incluye en el ejemplo</em></p>
 </div>
 <div id="otros-criterios-de-información" class="section level3">
@@ -459,19 +459,19 @@ HQIC =  - 2T^{-1} \sum_{t=1}^T \log f(y_t,\hat{\beta}) + p \frac{\log \log T}{T}
 <h3>Ejemplo</h3>
 <p>Ahora veamos si llegamos a la misma conclusión que habiamos llegado con el AIC al comparar nuestros dos modelos:</p>
 <pre class="r"><code>BIC(reg2)</code></pre>
-<pre><code>## [1] 39198.52</code></pre>
+<pre><code>## [1] 39067.39</code></pre>
 <pre class="r"><code>BIC(reg3)</code></pre>
-<pre><code>## [1] 44120.99</code></pre>
+<pre><code>## [1] 39011.33</code></pre>
 <pre class="r"><code>Time &lt;- reg2$rank+reg2$df.residual
 p &lt;- reg2$rank
 HQIC &lt;- - 2/Time * as.numeric(logLik(reg2))+ p*log(log(Time))/Time
 HQIC</code></pre>
-<pre><code>## [1] 1.417855</code></pre>
+<pre><code>## [1] 1.417213</code></pre>
 <pre class="r"><code>Time &lt;- reg3$rank+reg3$df.residual
 p &lt;- reg3$rank
 HQIC &lt;- - 2/Time * as.numeric(logLik(reg3))+ p*log(log(Time))/Time
 HQIC</code></pre>
-<pre><code>## [1] 1.424471</code></pre>
+<pre><code>## [1] 1.417759</code></pre>
 <p>En ambos casos seguimos escogiendo la regresión con las características del cliente por encima de las características del prestamo.</p>
 </div>
 <div id="selección-con-ci" class="section level2">
@@ -479,15 +479,296 @@ HQIC</code></pre>
 <p>En nuestro ejemplo solo hemos escogido entre dos modelos posibles. Sin embargo, en general tenemos una gran cantidad de posibles regresores y debemos escoger entre todas las posibles combinaciones de estas, por ejemplo en el caso de 10 variables tenemos <span class="math inline">\(2^{10} &gt; 1000\)</span> modelos posibles para estimar y para 20 variables sería <span class="math inline">\(2^{20} &gt; 1.000.000\)</span> modelos posibles. Claramente estimar todos los modelos no es posible, por lo cual necesitamos definir algún método para reducir este número de posibilidades.</p>
 <div id="selección-hacia-adelante-paso-a-paso." class="section level3">
 <h3>Selección hacia adelante paso a paso.</h3>
-<p>La selección hacia adelante paso a paso (<em>Forward stepwise slection</em>), donde el número máximo de variables es <span class="math inline">\(p_M\)</span>, se hace siguiendo los siguientes pasos:</p>
+<p>La selección hacia adelante paso a paso (<em>Forward stepwise selection</em>), donde el número máximo de variables es <span class="math inline">\(p_M\)</span>, se hace siguiendo los siguientes pasos:</p>
 <ol style="list-style-type: decimal">
 <li>Empezamos con un modelo solo con el intercepto (<span class="math inline">\(f_0^*\)</span>)</li>
-<li>Aumentamos el modelo agregandole una variable a la vez, estimamos los <span class="math inline">\(p_M\)</span> modelos y esogemos el mejor modelo con una variable (<span class="math inline">\(f_1^*\)</span>) basados en la máxima verosimilitud o MCO.</li>
-<li>A <span class="math inline">\(f_1^*\)</span> le adicionamos una variable a la vez, estimamos los <span class="math inline">\(p_M - 1\)</span> modelos y esogemos el mejor modelo con una variable (<span class="math inline">\(f_2^*\)</span>) basados en la máxima verosimilitud o MCO.</li>
-<li>Repetimos este proceso agregando de una variable</li>
+<li>Aumentamos el modelo agregandole una variable a la vez, estimamos los <span class="math inline">\(p_M\)</span> modelos y escogemos el mejor modelo con una variable (<span class="math inline">\(f_1^*\)</span>) basados en la máxima verosimilitud o MCO.</li>
+<li>A <span class="math inline">\(f_1^*\)</span> le adicionamos una variable a la vez, estimamos los <span class="math inline">\(p_M - 1\)</span> modelos y escogemos el mejor modelo con una variable (<span class="math inline">\(f_2^*\)</span>) basados en la máxima verosimilitud o MCO.</li>
+<li>Repetimos este proceso agregando de a una variable</li>
 <li>Estimamos el modelo con todas las variables <span class="math inline">\(f_M^*\)</span> (1 modelo)</li>
 <li>Escogemos el mejor modelo entre <span class="math inline">\(f_0^*\)</span>, <span class="math inline">\(f_1^*\)</span>, <span class="math inline">\(f_2^*\)</span>, …, <span class="math inline">\(f_M^*\)</span> usando el criterio de información escogido.</li>
 </ol>
+<p>Este método usa <span class="math inline">\(1+p_M+(p_M-1)+(p_M-2)+\dots+1) = 1 + \frac{p_M(p_M+1)}{2}\)</span> modelos, así en el caso de 10 variables tenemos que estimar solo 56 modelos y para 20 variables serían 211 modelos.</p>
+<p><em>Nota: Si no se quieren estimar todos los modelos posibles, una modificación a este procedimiento consiste en calcular el CI en cada paso y parar cuando ya este no mejore</em></p>
+</div>
+<div id="ejemplo-3" class="section level3">
+<h3>Ejemplo</h3>
+<p>Realicemos entonces la selección hacia adelante para el modelo que predice si la aplicación para hipoteca es aceptada o no. Y comparemos los modelos escogidos por el AIC y el BIC.</p>
+<pre class="r"><code>stepwise(reg1, trace = FALSE, direction = &quot;forward&quot;, criterion = &quot;AIC&quot;)</code></pre>
+<pre><code>## 
+## Direction:  forward
+## Criterion:  AIC</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = loan_granted ~ loan_purpose_name + white + tract_to_msamd_income + 
+##     asian_pacific + african_american + co_female + loan_type_name + 
+##     Owner_occupied + female + family_dwelling + minority_population + 
+##     number_of_owner_occupied_units + hispanic_latino + same_sex + 
+##     co_african_american, data = hmdaDC)
+## 
+## Coefficients:
+##                      (Intercept)    loan_purpose_nameHome purchase  
+##                        5.434e-02                         1.639e-01  
+##     loan_purpose_nameRefinancing                             white  
+##                        4.407e-02                         1.193e-01  
+##            tract_to_msamd_income                     asian_pacific  
+##                        1.797e-04                         9.954e-02  
+##                 african_american                         co_female  
+##                        4.850e-02                         5.589e-02  
+##        loan_type_nameFHA-insured  loan_type_nameFSA/RHS-guaranteed  
+##                       -7.313e-02                        -1.728e-01  
+##      loan_type_nameVA-guaranteed                    Owner_occupied  
+##                       -2.064e-02                         4.175e-02  
+##                           female                   family_dwelling  
+##                        3.293e-02                         2.591e-01  
+##              minority_population    number_of_owner_occupied_units  
+##                       -6.684e-04                         2.787e-05  
+##                  hispanic_latino                          same_sex  
+##                       -3.688e-02                         3.968e-02  
+##              co_african_american  
+##                        2.333e-02</code></pre>
+<pre class="r"><code>stepwise(reg1, trace = FALSE, direction = &quot;forward&quot;)</code></pre>
+<pre><code>## 
+## Direction:  forward
+## Criterion:  BIC</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = loan_granted ~ loan_purpose_name + white + tract_to_msamd_income + 
+##     asian_pacific + african_american + co_female + female + loan_type_name + 
+##     Owner_occupied + family_dwelling, data = hmdaDC)
+## 
+## Coefficients:
+##                      (Intercept)    loan_purpose_nameHome purchase  
+##                       -0.0078631                         0.1670909  
+##     loan_purpose_nameRefinancing                             white  
+##                        0.0461816                         0.1192978  
+##            tract_to_msamd_income                     asian_pacific  
+##                        0.0005517                         0.1015008  
+##                 african_american                         co_female  
+##                        0.0478066                         0.0611419  
+##                           female         loan_type_nameFHA-insured  
+##                        0.0325163                        -0.0766913  
+## loan_type_nameFSA/RHS-guaranteed       loan_type_nameVA-guaranteed  
+##                       -0.1785777                        -0.0235777  
+##                   Owner_occupied                   family_dwelling  
+##                        0.0417852                         0.2596171</code></pre>
+<p>Podemos observar que el AIC escoge un modelo con muchos más regresores que el BIC, lo cual es de esperarse yaque el BIC penaliza más fuerte el sesgo.</p>
+</div>
+<div id="selección-hacia-atras-paso-a-paso." class="section level3">
+<h3>Selección hacia atras paso a paso.</h3>
+<p>La selección hacia adelante paso a paso (<em>Backward stepwise selection</em>), donde el número máximo de variables es <span class="math inline">\(p_M\)</span>, se hace siguiendo los siguientes pasos:</p>
+<ol style="list-style-type: decimal">
+<li>Empezamos con el modelo incluyendo todas las variables (<span class="math inline">\(f_M^*\)</span>)</li>
+<li>Disminuimos el modelo quitandole una variable a la vez, estimamos los <span class="math inline">\(p_M\)</span> modelos y escogemos el mejor modelo con <span class="math inline">\(p_M-1\)</span> variables (<span class="math inline">\(f_{M-1}^*\)</span>) basados en la máxima verosimilitud o MCO.</li>
+<li>A <span class="math inline">\(f_{M-1}^*\)</span> le quitamos una variable a la vez, estimamos los <span class="math inline">\(p_M - 1\)</span> modelos y escogemos el mejor modelo con <span class="math inline">\(p_M-2\)</span> variables (<span class="math inline">\(f_{p_M-2}^*\)</span>) basados en la máxima verosimilitud o MCO.</li>
+<li>Repetimos este proceso agregando de a una variable</li>
+<li>Estimamos el modelo solo con el intercepto <span class="math inline">\(f_0^*\)</span> (1 modelo)</li>
+<li>Escogemos el mejor modelo entre <span class="math inline">\(f_0^*\)</span>, <span class="math inline">\(f_1^*\)</span>, <span class="math inline">\(f_2^*\)</span>, …, <span class="math inline">\(f_M^*\)</span> usando el criterio de información escogido.</li>
+</ol>
+<p>Este método usa <span class="math inline">\(1+p_M+(p_M-1)+(p_M-2)+\dots+1) = 1 + \frac{p_M(p_M+1)}{2}\)</span> modelos, así en el caso de 10 variables tenemos que estimar solo 56 modelos y para 20 variables serían 211 modelos.</p>
+<p><em>Nota: Si <span class="math inline">\(p_M &gt; N\)</span>, es decir si el número de variables es más alto que el número de observaciones esta selección no puede hacerse</em></p>
+</div>
+<div id="ejemplo-4" class="section level3">
+<h3>Ejemplo</h3>
+<p>Realicemos entonces la selección hacia atrás para el modelo que predice si la aplicación para hipoteca es aceptada o no. Y comparemos los modelos escogidos por el AIC y el BIC haciendo uso de ambos tipos de selección.</p>
+<pre class="r"><code>stepwise(reg1, trace = FALSE, direction = &quot;backward&quot;, criterion = &quot;AIC&quot;)</code></pre>
+<pre><code>## 
+## Direction:  backward
+## Criterion:  AIC</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = loan_granted ~ loan_type_name + loan_purpose_name + 
+##     minority_population + tract_to_msamd_income + number_of_owner_occupied_units + 
+##     hispanic_latino + white + african_american + co_african_american + 
+##     asian_pacific + female + co_female + same_sex + family_dwelling + 
+##     Owner_occupied, data = hmdaDC)
+## 
+## Coefficients:
+##                      (Intercept)         loan_type_nameFHA-insured  
+##                        5.434e-02                        -7.313e-02  
+## loan_type_nameFSA/RHS-guaranteed       loan_type_nameVA-guaranteed  
+##                       -1.728e-01                        -2.064e-02  
+##   loan_purpose_nameHome purchase      loan_purpose_nameRefinancing  
+##                        1.639e-01                         4.407e-02  
+##              minority_population             tract_to_msamd_income  
+##                       -6.684e-04                         1.797e-04  
+##   number_of_owner_occupied_units                   hispanic_latino  
+##                        2.787e-05                        -3.688e-02  
+##                            white                  african_american  
+##                        1.193e-01                         4.850e-02  
+##              co_african_american                     asian_pacific  
+##                        2.333e-02                         9.954e-02  
+##                           female                         co_female  
+##                        3.293e-02                         5.589e-02  
+##                         same_sex                   family_dwelling  
+##                        3.968e-02                         2.591e-01  
+##                   Owner_occupied  
+##                        4.175e-02</code></pre>
+<pre class="r"><code>stepwise(reg1, trace = FALSE, direction = &quot;backward&quot;)</code></pre>
+<pre><code>## 
+## Direction:  backward
+## Criterion:  BIC</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = loan_granted ~ loan_type_name + loan_purpose_name + 
+##     minority_population + number_of_owner_occupied_units + white + 
+##     african_american + asian_pacific + female + co_female + family_dwelling + 
+##     Owner_occupied, data = hmdaDC)
+## 
+## Coefficients:
+##                      (Intercept)         loan_type_nameFHA-insured  
+##                        8.101e-02                        -7.336e-02  
+## loan_type_nameFSA/RHS-guaranteed       loan_type_nameVA-guaranteed  
+##                       -1.709e-01                        -2.151e-02  
+##   loan_purpose_nameHome purchase      loan_purpose_nameRefinancing  
+##                        1.654e-01                         4.573e-02  
+##              minority_population    number_of_owner_occupied_units  
+##                       -9.691e-04                         3.507e-05  
+##                            white                  african_american  
+##                        1.169e-01                         5.352e-02  
+##                    asian_pacific                            female  
+##                        9.878e-02                         3.300e-02  
+##                        co_female                   family_dwelling  
+##                        6.258e-02                         2.612e-01  
+##                   Owner_occupied  
+##                        4.243e-02</code></pre>
+<p>Vemos que el modelo escogido por el AIC es el mismo, pero el modelo escogido por el BIC cambia. En la selección hacia adelante se escogia la variable <em>tract_to_msamd_income</em> que no es escogida la selección hacia atrás. Pero, la selección hacia atrás también selecciona las variables <em>minority_population</em> y <em>number_of_owner_occupied_units</em></p>
+</div>
+<div id="selección-hacia-adelante-y-hacia-atrás-paso-a-paso" class="section level3">
+<h3>Selección hacia adelante y hacia atrás paso a paso</h3>
+<p>La selección hacia adelante y hacia atrás paso a paso (<em>Forward/Backward stepwise selection</em>) se hace el procedimiento hacia adelante, pero al añadir cada variable nueva se realiza la selección hacia atrás en el modelo escogido hasta que no mejora el CI. Y repetimos el proceso hasta llegar a un modelo en el cual no podemos mejorar el CI haciendo selección hacia adelante o hacia atrás.</p>
+</div>
+<div id="ejemplo-5" class="section level3">
+<h3>Ejemplo</h3>
+<p>Realicemos este procedimiento con nuestros datos.</p>
+<pre class="r"><code>stepwise(reg1, trace = FALSE, direction = &quot;forward/backward&quot;, criterion = &quot;AIC&quot;)</code></pre>
+<pre><code>## 
+## Direction:  forward/backward
+## Criterion:  AIC</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = loan_granted ~ loan_purpose_name + white + tract_to_msamd_income + 
+##     asian_pacific + african_american + co_female + loan_type_name + 
+##     Owner_occupied + female + family_dwelling + minority_population + 
+##     number_of_owner_occupied_units + hispanic_latino + same_sex + 
+##     co_african_american, data = hmdaDC)
+## 
+## Coefficients:
+##                      (Intercept)    loan_purpose_nameHome purchase  
+##                        5.434e-02                         1.639e-01  
+##     loan_purpose_nameRefinancing                             white  
+##                        4.407e-02                         1.193e-01  
+##            tract_to_msamd_income                     asian_pacific  
+##                        1.797e-04                         9.954e-02  
+##                 african_american                         co_female  
+##                        4.850e-02                         5.589e-02  
+##        loan_type_nameFHA-insured  loan_type_nameFSA/RHS-guaranteed  
+##                       -7.313e-02                        -1.728e-01  
+##      loan_type_nameVA-guaranteed                    Owner_occupied  
+##                       -2.064e-02                         4.175e-02  
+##                           female                   family_dwelling  
+##                        3.293e-02                         2.591e-01  
+##              minority_population    number_of_owner_occupied_units  
+##                       -6.684e-04                         2.787e-05  
+##                  hispanic_latino                          same_sex  
+##                       -3.688e-02                         3.968e-02  
+##              co_african_american  
+##                        2.333e-02</code></pre>
+<pre class="r"><code>stepwise(reg1, trace = FALSE, direction = &quot;forward/backward&quot;)</code></pre>
+<pre><code>## 
+## Direction:  forward/backward
+## Criterion:  BIC</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = loan_granted ~ loan_purpose_name + white + tract_to_msamd_income + 
+##     asian_pacific + african_american + co_female + female + loan_type_name + 
+##     Owner_occupied + family_dwelling, data = hmdaDC)
+## 
+## Coefficients:
+##                      (Intercept)    loan_purpose_nameHome purchase  
+##                       -0.0078631                         0.1670909  
+##     loan_purpose_nameRefinancing                             white  
+##                        0.0461816                         0.1192978  
+##            tract_to_msamd_income                     asian_pacific  
+##                        0.0005517                         0.1015008  
+##                 african_american                         co_female  
+##                        0.0478066                         0.0611419  
+##                           female         loan_type_nameFHA-insured  
+##                        0.0325163                        -0.0766913  
+## loan_type_nameFSA/RHS-guaranteed       loan_type_nameVA-guaranteed  
+##                       -0.1785777                        -0.0235777  
+##                   Owner_occupied                   family_dwelling  
+##                        0.0417852                         0.2596171</code></pre>
+</div>
+<div id="selección-hacia-atrás-y-hacia-adelante-paso-a-paso" class="section level3">
+<h3>Selección hacia atrás y hacia adelante paso a paso</h3>
+<p>La selección hacia adelante y hacia atrás paso a paso (<em>Backward/Forward stepwise selection</em>) se hace el procedimiento hacia atrás, pero al quitar cada variable se realiza la selección hacia adelante en el modelo escogido hasta que no mejora el CI. Y repetimos el proceso hasta llegar a un modelo en el cual no podemos mejorar el CI haciendo selección hacia adelante o hacia atrás.</p>
+</div>
+<div id="ejemplo-6" class="section level3">
+<h3>Ejemplo</h3>
+<p>Realicemos este procedimiento con nuestros datos.</p>
+<pre class="r"><code>stepwise(reg1, trace = FALSE, direction = &quot;backward/forward&quot;, criterion = &quot;AIC&quot;)</code></pre>
+<pre><code>## 
+## Direction:  backward/forward
+## Criterion:  AIC</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = loan_granted ~ loan_type_name + loan_purpose_name + 
+##     minority_population + tract_to_msamd_income + number_of_owner_occupied_units + 
+##     hispanic_latino + white + african_american + co_african_american + 
+##     asian_pacific + female + co_female + same_sex + family_dwelling + 
+##     Owner_occupied, data = hmdaDC)
+## 
+## Coefficients:
+##                      (Intercept)         loan_type_nameFHA-insured  
+##                        5.434e-02                        -7.313e-02  
+## loan_type_nameFSA/RHS-guaranteed       loan_type_nameVA-guaranteed  
+##                       -1.728e-01                        -2.064e-02  
+##   loan_purpose_nameHome purchase      loan_purpose_nameRefinancing  
+##                        1.639e-01                         4.407e-02  
+##              minority_population             tract_to_msamd_income  
+##                       -6.684e-04                         1.797e-04  
+##   number_of_owner_occupied_units                   hispanic_latino  
+##                        2.787e-05                        -3.688e-02  
+##                            white                  african_american  
+##                        1.193e-01                         4.850e-02  
+##              co_african_american                     asian_pacific  
+##                        2.333e-02                         9.954e-02  
+##                           female                         co_female  
+##                        3.293e-02                         5.589e-02  
+##                         same_sex                   family_dwelling  
+##                        3.968e-02                         2.591e-01  
+##                   Owner_occupied  
+##                        4.175e-02</code></pre>
+<pre class="r"><code>stepwise(reg1, trace = FALSE, direction = &quot;backward/forward&quot;)</code></pre>
+<pre><code>## 
+## Direction:  backward/forward
+## Criterion:  BIC</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = loan_granted ~ loan_type_name + loan_purpose_name + 
+##     minority_population + number_of_owner_occupied_units + white + 
+##     african_american + asian_pacific + female + co_female + family_dwelling + 
+##     Owner_occupied, data = hmdaDC)
+## 
+## Coefficients:
+##                      (Intercept)         loan_type_nameFHA-insured  
+##                        8.101e-02                        -7.336e-02  
+## loan_type_nameFSA/RHS-guaranteed       loan_type_nameVA-guaranteed  
+##                       -1.709e-01                        -2.151e-02  
+##   loan_purpose_nameHome purchase      loan_purpose_nameRefinancing  
+##                        1.654e-01                         4.573e-02  
+##              minority_population    number_of_owner_occupied_units  
+##                       -9.691e-04                         3.507e-05  
+##                            white                  african_american  
+##                        1.169e-01                         5.352e-02  
+##                    asian_pacific                            female  
+##                        9.878e-02                         3.300e-02  
+##                        co_female                   family_dwelling  
+##                        6.258e-02                         2.612e-01  
+##                   Owner_occupied  
+##                        4.243e-02</code></pre>
+<p>Es importante anotar que ninguno de estos métodos garantiza encontrar el mejor modelo (de todas las posibles combinaciones), pero algunos criterios si logran encontrarlo si <span class="math inline">\(N \rightarrow \infty\)</span></p>
 </div>
 </div>
 </div>
